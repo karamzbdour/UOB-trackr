@@ -24,6 +24,7 @@ export default function Home() {
         />
         <EntryCard entry={sampleEntry} />
         <StatCard title={"Avg sleep"} value={"7.2h"} />
+        <StatCard title={""} value={""}/>
       </main>
     </div>
   );
