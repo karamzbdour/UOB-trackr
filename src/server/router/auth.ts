@@ -1,4 +1,4 @@
-import { router, publicProcedure } from "@/server/trpc";
+import { router, publicProcedure, protectedProcedure } from "@/server/trpc";
 import { registerSchema, loginSchema } from "@/lib/validators";
 import { users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -9,6 +9,17 @@ import { TRPCError } from "@trpc/server";
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export const authRouter = router({
+  me: protectedProcedure.query(async ({ctx}) => {
+    const [existing] = await ctx.db.select().from(users).where(eq(users.id,ctx.user.id))
+    if (!existing) {
+      throw new TRPCError({code:"NOT_FOUND", message:"User not found"})
+    }
+    return {
+      id:existing.id,
+      name:existing.name,
+      email:existing.email
+    }
+  }),
   register: publicProcedure
     .input(registerSchema)
     .mutation(async ({ input, ctx }) => {
